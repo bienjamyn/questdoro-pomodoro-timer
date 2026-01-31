@@ -35,16 +35,6 @@
 			path = PixelDoro;
 			sourceTree = "<group>";
 		};
-		5B1618BA2EF5E10C0065071A /* PixelDoroTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = PixelDoroTests;
-			sourceTree = "<group>";
-		};
-		5B1618C42EF5E10D0065071A /* PixelDoroUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = PixelDoroUITests;
-			sourceTree = "<group>";
-		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -76,8 +66,6 @@
 			isa = PBXGroup;
 			children = (
 				5B1618A82EF5E10A0065071A /* PixelDoro */,
-				5B1618BA2EF5E10C0065071A /* PixelDoroTests */,
-				5B1618C42EF5E10D0065071A /* PixelDoroUITests */,
 				5B1618A72EF5E10A0065071A /* Products */,
 			);
 			sourceTree = "<group>";
@@ -130,9 +118,6 @@
 			dependencies = (
 				5B1618B92EF5E10C0065071A /* PBXTargetDependency */,
 			);
-			fileSystemSynchronizedGroups = (
-				5B1618BA2EF5E10C0065071A /* PixelDoroTests */,
-			);
 			name = PixelDoroTests;
 			packageProductDependencies = (
 			);
@@ -152,9 +137,6 @@
 			);
 			dependencies = (
 				5B1618C32EF5E10D0065071A /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				5B1618C42EF5E10D0065071A /* PixelDoroUITests */,
 			);
 			name = PixelDoroUITests;
 			packageProductDependencies = (
