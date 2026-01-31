@@ -11,7 +11,6 @@ import AppKit
 struct PillView: View {
     @ObservedObject var engine: PomodoroEngine
     let quitAction: () -> Void
-    let onWidthChange: (CGFloat) -> Void
 
     @State private var hovering = false
     @State private var isEditing = false
@@ -35,36 +34,36 @@ struct PillView: View {
     }
 
     var body: some View {
+        // Fixed frame container - aligned to top center so pill hangs from menu bar
         ZStack(alignment: .top) {
-            // Background pill shape
-            if hovering {
-                UnevenRoundedRectangle(
-                    topLeadingRadius: 0,
-                    bottomLeadingRadius: cornerRadius,
-                    bottomTrailingRadius: cornerRadius,
-                    topTrailingRadius: 0
-                )
-                .fill(Color(hex: "0027FF"))
-                .frame(width: currentWidth, height: currentHeight)
-            } else {
-                UnevenRoundedRectangle(
-                    topLeadingRadius: 0,
-                    bottomLeadingRadius: 10,
-                    bottomTrailingRadius: 10,
-                    topTrailingRadius: 0
-                )
-                .fill(Color(hex: "0027FF"))
-                .frame(width: currentWidth, height: currentHeight)
-            }
+            // Single background pill shape (no conditional)
+            UnevenRoundedRectangle(
+                topLeadingRadius: 0,
+                bottomLeadingRadius: cornerRadius,
+                bottomTrailingRadius: cornerRadius,
+                topTrailingRadius: 0
+            )
+            .fill(Color(hex: "0027FF"))
+            .frame(width: currentWidth, height: currentHeight)
+            .shadow(color: .black.opacity(hovering ? 0 : 0.3), radius: 4, x: 0, y: 2)
+            .contentShape(UnevenRoundedRectangle(
+                topLeadingRadius: 0,
+                bottomLeadingRadius: cornerRadius,
+                bottomTrailingRadius: cornerRadius,
+                topTrailingRadius: 0
+            ))
+            .onHover { inside in hovering = inside }
 
-            // Content
-            VStack(spacing: hovering ? 8 : 0) {
-                // Timer
+            // Content - always present, controls fade in/out
+            VStack(spacing: 8) {
+                // Timer - anchored at top
                 timeView
                     .padding(.top, hovering ? 10 : 0)
+                    .frame(height: hovering ? nil : collapsedHeight, alignment: .center)
+                    .offset(y: hovering ? 0 : 3)
 
-                // Controls (only when hovering)
-                if hovering {
+                // Controls - use opacity and scale for smooth transition
+                VStack(spacing: 8) {
                     // Yellow square buttons row
                     HStack(spacing: 16) {
                         controlButton(imageName: "restart") {
@@ -109,25 +108,17 @@ struct PillView: View {
                     }
                     .padding(.bottom, 8)
                 }
+                .opacity(hovering ? 1 : 0)
+                .scaleEffect(hovering ? 1 : 0.8)
+                .frame(height: hovering ? nil : 0)
+                .clipped()
             }
             .padding(.horizontal, 10)
-            .frame(maxHeight: .infinity, alignment: hovering ? .top : .center)
+            .frame(width: currentWidth, height: currentHeight)
+            .onHover { inside in hovering = inside }
         }
-        .frame(width: currentWidth, height: currentHeight)
-        .shadow(color: .black.opacity(hovering ? 0 : 0.3), radius: 4, x: 0, y: 2)
-        .animation(.easeInOut(duration: 0.25), value: hovering)
-        .animation(.easeInOut(duration: 0.25), value: currentWidth)
-        .animation(.easeInOut(duration: 0.25), value: currentHeight)
-        .onChange(of: currentWidth) { _, newWidth in
-            onWidthChange(newWidth)
-        }
-        .onAppear {
-            onWidthChange(currentWidth)
-        }
-        .contentShape(Rectangle())
-        .onHover { inside in
-            hovering = inside
-        }
+        .frame(width: expandedWidth, height: 150, alignment: .top) // Fixed container matching window size
+        .animation(.spring(response: 0.3, dampingFraction: 0.8), value: hovering)
     }
 
     private var timeView: some View {
@@ -149,35 +140,21 @@ struct PillView: View {
                         inputFocused = true
                     }
             } else {
-                Group {
-                    if hovering {
-                        // Expanded state with shadow
-                        ZStack {
-                            Text(engine.displayString())
-                                .font(.custom("Jersey 10", size: 30))
-                                .foregroundStyle(.black)
-                                .offset(x: 2, y: 2)
+                // Single timer view - identical for both states (no conditional needed)
+                ZStack {
+                    Text(engine.displayString())
+                        .font(.custom("Jersey 10", size: 30))
+                        .foregroundStyle(.black)
+                        .offset(x: 2, y: 2)
 
-                            Text(engine.displayString())
-                                .font(.custom("Jersey 10", size: 30))
-                                .foregroundStyle(.white)
-                        }
-                    } else {
-                        // Collapsed state with shadow
-                        ZStack {
-                            Text(engine.displayString())
-                                .font(.custom("Jersey 10", size: 30))
-                                .foregroundStyle(.black)
-                                .offset(x: 2, y: 2)
-                            Text(engine.displayString())
-                                .font(.custom("Jersey 10", size: 30))
-                                .foregroundStyle(.white)
-                        }
-                    }
+                    Text(engine.displayString())
+                        .font(.custom("Jersey 10", size: 30))
+                        .foregroundStyle(.white)
                 }
                 .contentShape(Rectangle())
                 .onTapGesture(count: 2) {
                     NSApp.activate(ignoringOtherApps: true)
+                    engine.stop()
                     input = engine.displayString()
                     isEditing = true
                     inputFocused = true

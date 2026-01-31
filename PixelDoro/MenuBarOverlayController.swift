@@ -66,14 +66,14 @@ final class AboutPanelController {
 }
 
 final class MenuBarOverlayController {
-    private var currentWidth: CGFloat = 130  // Start with collapsed width
-    private let maxPillHeight: CGFloat = 45  // Max height to accommodate expansion
+    private var currentWidth: CGFloat = 200  // Use expanded width to avoid resizing
+    private let maxPillHeight: CGFloat = 150 // Height to fit expanded pill (140pt + padding)
     private let window: KeyablePanel
 
     init(engine: PomodoroEngine) {
         // 1) Create window first so self.window is initialized safely
         let w = KeyablePanel(
-            contentRect: NSRect(x: 0, y: 0, width: 130, height: 45),
+            contentRect: NSRect(x: 0, y: 0, width: 200, height: 150),
             styleMask: [.borderless, .nonactivatingPanel],
             backing: .buffered,
             defer: false
@@ -90,18 +90,11 @@ final class MenuBarOverlayController {
 
         self.window = w
 
-        // 2) Now it is safe to create the SwiftUI view and capture self
+        // 2) Now it is safe to create the SwiftUI view
+        // Window stays fixed size; SwiftUI handles all animation internally
         let root = PillView(
             engine: engine,
-            quitAction: { NSApp.terminate(nil) },
-            onWidthChange: { [weak self] w in
-                guard let self else { return }
-                let clamped = min(max(w, 80), 200)
-                if abs(clamped - self.currentWidth) > 1 {
-                    self.currentWidth = clamped
-                    self.recenter()
-                }
-            }
+            quitAction: { NSApp.terminate(nil) }
         )
 
         let hosting = NSHostingView(rootView: root)
@@ -123,10 +116,12 @@ final class MenuBarOverlayController {
     @objc private func recenter() {
         guard let screen = NSScreen.main else { return }
 
+        // Fixed window size - SwiftUI content animates within this frame
         let height: CGFloat = maxPillHeight
-        let y = screen.frame.maxY - height
-
         let width: CGFloat = currentWidth
+
+        // Position so the top of the window touches the top of the screen
+        let y = screen.frame.maxY - height
         let x = screen.frame.midX - (width / 2)
 
         window.setFrame(NSRect(x: x, y: y, width: width, height: height), display: true)
