@@ -1,6 +1,6 @@
 # PixelDoro
 
-A minimal, pixel-art styled Pomodoro timer for your Mac's menu bar.
+A minimal, pixel-art styled Pomodoro timer.
 
 ## Download
 
@@ -17,12 +17,12 @@ A minimal, pixel-art styled Pomodoro timer for your Mac's menu bar.
 
 ## Features
 
-- Lives in the menu bar
 - Pixel art aesthetic
+- Lives in the menu bar
 - Focus and break timer modes
 - Hover to expand, click to control
 - Double-click the timer to enter a custom time (press Enter to save)
 
 ## License
 
-MIT License - see [LICENSE](LICENSE) for details.
+[MIT License](LICENSE)
