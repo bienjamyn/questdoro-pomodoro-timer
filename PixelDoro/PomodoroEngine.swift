@@ -163,7 +163,7 @@ final class PomodoroEngine: ObservableObject {
 
     private func playBreakComplete() {
         // More noticeable ring when break is over
-        NSSound(named: "Ping")?.play()
+        NSSound(named: "Hero")?.play()
     }
 }
 

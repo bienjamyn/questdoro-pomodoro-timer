@@ -10,9 +10,11 @@ import AppKit
 
 struct PillView: View {
     @ObservedObject var engine: PomodoroEngine
+    @ObservedObject var hoverState: HoverState
     let quitAction: () -> Void
 
-    @State private var hovering = false
+    private var hovering: Bool { hoverState.isHovering }
+
     @State private var isEditing = false
     @State private var input = ""
 
@@ -52,7 +54,7 @@ struct PillView: View {
                 bottomTrailingRadius: cornerRadius,
                 topTrailingRadius: 0
             ))
-            .onHover { inside in hovering = inside }
+            .onHover { inside in hoverState.isHovering = inside }
 
             // Content - always present, controls fade in/out
             VStack(spacing: 8) {
@@ -115,7 +117,7 @@ struct PillView: View {
             }
             .padding(.horizontal, 10)
             .frame(width: currentWidth, height: currentHeight)
-            .onHover { inside in hovering = inside }
+            .onHover { inside in hoverState.isHovering = inside }
         }
         .frame(width: expandedWidth, height: 150, alignment: .top) // Fixed container matching window size
         .animation(.spring(response: 0.3, dampingFraction: 0.8), value: hovering)

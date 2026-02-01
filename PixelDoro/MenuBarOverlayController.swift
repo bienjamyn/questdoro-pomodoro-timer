@@ -13,6 +13,17 @@ final class KeyablePanel: NSPanel {
     override var canBecomeMain: Bool { false }
 }
 
+final class HoverState: ObservableObject {
+    @Published var isHovering: Bool = false
+
+    var currentPillHeight: CGFloat { isHovering ? 140 : 28 }
+    var currentPillWidth: CGFloat { isHovering ? 200 : 130 }
+}
+
+final class ClickThroughHostingView<Content: View>: NSHostingView<Content> {
+    override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
+}
+
 final class AboutPanelController {
     private var panel: KeyablePanel?
 
@@ -69,6 +80,9 @@ final class MenuBarOverlayController {
     private var currentWidth: CGFloat = 200  // Use expanded width to avoid resizing
     private let maxPillHeight: CGFloat = 150 // Height to fit expanded pill (140pt + padding)
     private let window: KeyablePanel
+    private let hoverState = HoverState()
+    private var globalMouseMonitor: Any?
+    private var localMouseMonitor: Any?
 
     init(engine: PomodoroEngine) {
         // 1) Create window first so self.window is initialized safely
@@ -86,7 +100,7 @@ final class MenuBarOverlayController {
         w.hidesOnDeactivate = false
         w.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
         w.acceptsMouseMovedEvents = true
-        w.ignoresMouseEvents = false
+        w.ignoresMouseEvents = true  // Start with click-through
 
         self.window = w
 
@@ -94,11 +108,65 @@ final class MenuBarOverlayController {
         // Window stays fixed size; SwiftUI handles all animation internally
         let root = PillView(
             engine: engine,
+            hoverState: hoverState,
             quitAction: { NSApp.terminate(nil) }
         )
 
-        let hosting = NSHostingView(rootView: root)
+        let hosting = ClickThroughHostingView(rootView: root)
         self.window.contentView = hosting
+
+        setupGlobalMouseMonitor()
+    }
+
+    deinit {
+        if let monitor = globalMouseMonitor {
+            NSEvent.removeMonitor(monitor)
+        }
+        if let monitor = localMouseMonitor {
+            NSEvent.removeMonitor(monitor)
+        }
+    }
+
+    private func setupGlobalMouseMonitor() {
+        // Global monitor receives events even when ignoresMouseEvents = true
+        globalMouseMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.mouseMoved, .leftMouseDragged]) { [weak self] _ in
+            self?.handleGlobalMouseMove()
+        }
+
+        // Local monitor for when our window IS receiving events
+        localMouseMonitor = NSEvent.addLocalMonitorForEvents(matching: [.mouseMoved]) { [weak self] event in
+            self?.handleGlobalMouseMove()
+            return event
+        }
+    }
+
+    private func handleGlobalMouseMove() {
+        let mouseLocation = NSEvent.mouseLocation  // Screen coordinates
+        let isInsidePill = isMouseInsidePill(screenLocation: mouseLocation)
+
+        // Only update if changed to avoid unnecessary work
+        if window.ignoresMouseEvents == isInsidePill {
+            window.ignoresMouseEvents = !isInsidePill
+        }
+    }
+
+    private func isMouseInsidePill(screenLocation: NSPoint) -> Bool {
+        let windowFrame = window.frame
+
+        // Convert screen coords to window-relative coords
+        let locationInWindow = NSPoint(
+            x: screenLocation.x - windowFrame.origin.x,
+            y: screenLocation.y - windowFrame.origin.y
+        )
+
+        // Calculate pill rect (in window coordinates, origin at bottom-left)
+        let pillHeight = hoverState.currentPillHeight
+        let pillWidth = hoverState.currentPillWidth
+        let pillX = (200 - pillWidth) / 2
+        let pillMinY = maxPillHeight - pillHeight  // Pill anchored at top
+
+        let pillRect = NSRect(x: pillX, y: pillMinY, width: pillWidth, height: pillHeight)
+        return pillRect.contains(locationInWindow)
     }
 
     func showCentered() {

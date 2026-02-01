@@ -12,3 +12,6 @@ DerivedData/
 
 # Archives
 *.xcarchive
+
+# Claude Code
+.claude/
