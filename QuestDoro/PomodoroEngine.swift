@@ -132,14 +132,14 @@ final class PomodoroEngine: ObservableObject {
             timer = nil
 
         case .breakTime:
-            playBreakComplete()
             // Check if all 4 cycles are done
             if completedFocusSessions >= totalFocusSessions {
                 playCongratsSound()
                 resetAll()
                 return
             }
-            // Otherwise, continue to next focus
+            playBreakComplete()
+            // Continue to next focus
             phase = .focus
             remaining = focusSeconds
             isRunning = false
@@ -167,7 +167,9 @@ final class PomodoroEngine: ObservableObject {
     }
 
     private func playCongratsSound() {
-        NSSound(named: "Purr")?.play()
+        if let url = Bundle.main.url(forResource: "tada", withExtension: "mp3") {
+            NSSound(contentsOf: url, byReference: true)?.play()
+        }
     }
 }
 

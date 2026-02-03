@@ -188,8 +188,9 @@ final class MenuBarOverlayController {
         let height: CGFloat = maxPillHeight
         let width: CGFloat = currentWidth
 
-        // Position so the top of the window touches the top of the screen
-        let y = screen.frame.maxY - height
+        // Position so the top of the window sits below the menu bar / notch
+        let menuBarHeight = screen.safeAreaInsets.top
+        let y = screen.frame.maxY - menuBarHeight - height
         let x = screen.frame.midX - (width / 2)
 
         window.setFrame(NSRect(x: x, y: y, width: width, height: height), display: true)

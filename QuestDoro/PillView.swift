@@ -33,6 +33,7 @@ struct PillView: View {
     @State private var restartClickPending = false
     @State private var flashText: String? = nil
 
+
     @FocusState private var inputFocused: Bool
 
     // Colors
@@ -135,7 +136,7 @@ struct PillView: View {
                     HStack(spacing: 6) {
                         ForEach(0..<engine.totalFocusSessions, id: \.self) { index in
                             Circle()
-                                .fill(index < engine.completedFocusSessions ? Color(hex: "FFD700") : Color.gray.opacity(0.5))
+                                .fill(dotColor(for: index))
                                 .frame(width: 8, height: 8)
                         }
                     }
@@ -222,7 +223,9 @@ struct PillView: View {
     private func showFlashText(_ text: String) {
         flashText = text
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-            flashText = nil
+            withAnimation(.easeOut(duration: 0.5)) {
+                flashText = nil
+            }
         }
     }
 
@@ -283,6 +286,16 @@ struct PillView: View {
             }
         }
         .animation(.easeInOut(duration: 0.3), value: flashText)
+    }
+
+    private func dotColor(for index: Int) -> Color {
+        if index < engine.completedFocusSessions {
+            return goldAccent
+        } else if index == engine.completedFocusSessions && engine.phase == .focus {
+            return goldAccent.opacity(0.75)
+        } else {
+            return Color.gray.opacity(0.5)
+        }
     }
 
     private func controlButton(imageName: String, disabled: Bool = false, action: @escaping () -> Void) -> some View {
