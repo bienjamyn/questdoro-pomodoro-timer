@@ -6,7 +6,7 @@ A minimal, pixel-art styled Pomodoro timer.
 
 ## Download the app
 
-**[Download QuestDoro](../../releases/latest)** (macOS 13+)
+**[Download QuestDoro V1.1.1](../../releases/latest)** (macOS 13+)
 
 ## Install
 
