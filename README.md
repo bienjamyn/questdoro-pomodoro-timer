@@ -12,8 +12,8 @@ A minimal, pixel-art styled Pomodoro timer.
 
 1. Download `QuestDoro.zip` from the link above
 2. Unzip the file
-3. Drag `QuestDoro.app` to your Applications folder
-4. Open QuestDoro from Applications
+3. Drag `QuestDoro.app` to your Applications folder or Desktop
+4. Open QuestDoro and time to focus!
 
 > **Note:** On first launch, your Mac may block the app. Go to **System Settings → Privacy & Security** and click "Open Anyway".
 
