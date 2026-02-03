@@ -8,6 +8,18 @@
 import SwiftUI
 import AppKit
 
+// Particle model for sparkle celebration
+struct PixelParticle: Identifiable {
+    let id = UUID()
+    var x: CGFloat
+    var y: CGFloat
+    var size: CGFloat
+    var angle: Double
+    var velocity: CGFloat
+    var opacity: Double
+    var rotation: Double
+}
+
 struct PillView: View {
     @ObservedObject var engine: PomodoroEngine
     @ObservedObject var hoverState: HoverState
@@ -17,8 +29,15 @@ struct PillView: View {
 
     @State private var isEditing = false
     @State private var input = ""
+    @State private var sparkleParticles: [PixelParticle] = []
+    @State private var restartClickPending = false
+    @State private var flashText: String? = nil
 
     @FocusState private var inputFocused: Bool
+
+    // Colors
+    private let focusBlue = Color(hex: "0027FF")
+    private let goldAccent = Color(hex: "FFD700")
 
     // Dimensions
     private let collapsedHeight: CGFloat = 28  // Timer only
@@ -38,14 +57,14 @@ struct PillView: View {
     var body: some View {
         // Fixed frame container - aligned to top center so pill hangs from menu bar
         ZStack(alignment: .top) {
-            // Single background pill shape (no conditional)
+            // Background pill shape with break state color
             UnevenRoundedRectangle(
                 topLeadingRadius: 0,
                 bottomLeadingRadius: cornerRadius,
                 bottomTrailingRadius: cornerRadius,
                 topTrailingRadius: 0
             )
-            .fill(Color(hex: "0027FF"))
+            .fill(focusBlue)
             .frame(width: currentWidth, height: currentHeight)
             .shadow(color: .black.opacity(hovering ? 0 : 0.3), radius: 4, x: 0, y: 2)
             .contentShape(UnevenRoundedRectangle(
@@ -55,6 +74,12 @@ struct PillView: View {
                 topTrailingRadius: 0
             ))
             .onHover { inside in hoverState.isHovering = inside }
+            .onTapGesture(count: 2) {
+                if isEditing {
+                    isEditing = false
+                    inputFocused = false
+                }
+            }
 
             // Content - always present, controls fade in/out
             VStack(spacing: 8) {
@@ -75,12 +100,18 @@ struct PillView: View {
                                 isEditing = false
                                 inputFocused = false
                             } else {
-                                engine.restartCurrent()
+                                if restartClickPending {
+                                    engine.resetAll()
+                                    restartClickPending = false
+                                } else {
+                                    engine.restartCurrent()
+                                    restartClickPending = true
+                                }
                             }
                         }
 
-                        controlButton(imageName: engine.isRunning ? "pause" : "play") {
-                            if isEditing { return }
+                        controlButton(imageName: engine.isRunning ? "pause" : "play", disabled: isEditing) {
+                            restartClickPending = false
                             engine.isRunning ? engine.stop() : engine.start()
                         }
 
@@ -118,9 +149,81 @@ struct PillView: View {
             .padding(.horizontal, 10)
             .frame(width: currentWidth, height: currentHeight)
             .onHover { inside in hoverState.isHovering = inside }
+
+            // Sparkle overlay for focus complete celebration
+            sparkleOverlay
         }
         .frame(width: expandedWidth, height: 150, alignment: .top) // Fixed container matching window size
         .animation(.spring(response: 0.3, dampingFraction: 0.8), value: hovering)
+        .animation(.spring(response: 0.3, dampingFraction: 0.8), value: engine.phase)
+        .onChange(of: engine.phase) { oldPhase, newPhase in
+            if oldPhase == .focus && newPhase == .breakTime {
+                triggerSparkle()
+                showFlashText("BREAK")
+            } else if oldPhase == .breakTime && newPhase == .focus {
+                showFlashText("FOCUS")
+            }
+        }
+    }
+
+    // MARK: - Sparkle Celebration
+
+    private var sparkleOverlay: some View {
+        GeometryReader { geo in
+            ZStack {
+                ForEach(sparkleParticles) { particle in
+                    Rectangle()
+                        .fill(goldAccent)
+                        .frame(width: particle.size, height: particle.size)
+                        .opacity(particle.opacity)
+                        .rotationEffect(.degrees(particle.rotation))
+                        .offset(x: particle.x, y: particle.y)
+                }
+            }
+            .position(x: geo.size.width / 2, y: collapsedHeight / 2)
+        }
+        .allowsHitTesting(false)
+    }
+
+    private func triggerSparkle() {
+        let particleCount = 14
+
+        // Create particles at center
+        sparkleParticles = (0..<particleCount).map { _ in
+            PixelParticle(
+                x: 0,
+                y: 0,
+                size: CGFloat.random(in: 4...8),
+                angle: Double.random(in: 0...(2 * .pi)),
+                velocity: CGFloat.random(in: 50...100),
+                opacity: 1.0,
+                rotation: 0
+            )
+        }
+
+        // Animate burst outward
+        withAnimation(.easeOut(duration: 0.5)) {
+            sparkleParticles = sparkleParticles.map { p in
+                var updated = p
+                updated.x = cos(p.angle) * p.velocity
+                updated.y = sin(p.angle) * p.velocity
+                updated.opacity = 0
+                updated.rotation = Double.random(in: -180...180)
+                return updated
+            }
+        }
+
+        // Cleanup after animation
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+            sparkleParticles = []
+        }
+    }
+
+    private func showFlashText(_ text: String) {
+        flashText = text
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            flashText = nil
+        }
     }
 
     private var timeView: some View {
@@ -138,11 +241,27 @@ struct PillView: View {
                         isEditing = false
                         inputFocused = false
                     }
+                    .onExitCommand {
+                        isEditing = false
+                        inputFocused = false
+                    }
                     .onAppear {
                         inputFocused = true
                     }
+            } else if let text = flashText {
+                // Flash text when timer completes
+                ZStack {
+                    Text(text)
+                        .font(.custom("Jersey 10", size: 30))
+                        .foregroundStyle(.black)
+                        .offset(x: 2, y: 2)
+                    Text(text)
+                        .font(.custom("Jersey 10", size: 30))
+                        .foregroundStyle(.white)
+                }
+                .transition(.opacity)
             } else {
-                // Single timer view - identical for both states (no conditional needed)
+                // Normal timer display
                 ZStack {
                     Text(engine.displayString())
                         .font(.custom("Jersey 10", size: 30))
@@ -163,9 +282,10 @@ struct PillView: View {
                 }
             }
         }
+        .animation(.easeInOut(duration: 0.3), value: flashText)
     }
 
-    private func controlButton(imageName: String, action: @escaping () -> Void) -> some View {
+    private func controlButton(imageName: String, disabled: Bool = false, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Image(imageName)
                 .resizable()
@@ -173,6 +293,8 @@ struct PillView: View {
                 .frame(width: 38, height: 38)
         }
         .buttonStyle(.plain)
+        .opacity(disabled ? 0.75 : 1.0)
+        .disabled(disabled)
     }
 }
 

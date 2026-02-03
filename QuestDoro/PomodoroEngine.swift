@@ -73,6 +73,8 @@ final class PomodoroEngine: ObservableObject {
         stop()
         phase = .idle
         completedFocusSessions = 0
+        focusSeconds = 25 * 60
+        breakSeconds = 5 * 60
         remaining = focusSeconds
     }
 
@@ -122,15 +124,7 @@ final class PomodoroEngine: ObservableObject {
         case .focus:
             playFocusComplete()
             completedFocusSessions += 1
-            if completedFocusSessions >= totalFocusSessions {
-                phase = .finished
-                remaining = focusSeconds  // Reset timer to 25:00
-                isRunning = false
-                timer?.cancel()
-                timer = nil
-                return
-            }
-            // Switch to break but do NOT auto-start
+            // Always go to break, even after 4th focus
             phase = .breakTime
             remaining = breakSeconds
             isRunning = false
@@ -139,7 +133,13 @@ final class PomodoroEngine: ObservableObject {
 
         case .breakTime:
             playBreakComplete()
-            // Switch to next focus but do NOT auto-start
+            // Check if all 4 cycles are done
+            if completedFocusSessions >= totalFocusSessions {
+                playCongratsSound()
+                resetAll()
+                return
+            }
+            // Otherwise, continue to next focus
             phase = .focus
             remaining = focusSeconds
             isRunning = false
@@ -164,6 +164,10 @@ final class PomodoroEngine: ObservableObject {
     private func playBreakComplete() {
         // More noticeable ring when break is over
         NSSound(named: "Hero")?.play()
+    }
+
+    private func playCongratsSound() {
+        NSSound(named: "Purr")?.play()
     }
 }
 
