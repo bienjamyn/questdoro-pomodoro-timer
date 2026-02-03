@@ -1,17 +1,17 @@
-# PixelDoro
+# QuestDoro
 
 A minimal, pixel-art styled Pomodoro timer.
 
 ## Download
 
-**[Download PixelDoro](../../releases/latest)** (macOS 13+)
+**[Download QuestDoro](../../releases/latest)** (macOS 13+)
 
 ## Install
 
-1. Download `PixelDoro.zip` from the link above
+1. Download `QuestDoro.zip` from the link above
 2. Unzip the file
-3. Drag `PixelDoro.app` to your Applications folder
-4. Open PixelDoro from Applications
+3. Drag `QuestDoro.app` to your Applications folder
+4. Open QuestDoro from Applications
 
 > **Note:** On first launch, macOS may block the app. Go to **System Settings → Privacy & Security** and click "Open Anyway".
 

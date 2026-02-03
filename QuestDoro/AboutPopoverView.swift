@@ -1,6 +1,6 @@
 //
 //  AboutPopoverView.swift
-//  PixelDoro
+//  QuestDoro
 //
 //  Created by Kevin Tayong on 2025-12-21.
 //
@@ -12,7 +12,7 @@ struct AboutPopoverView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("PixelDoro")
+            Text("QuestDoro")
                 .font(.system(size: 16, weight: .bold))
 
             Text("v0.1")
