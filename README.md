@@ -15,7 +15,7 @@ A minimal, pixel-art styled Pomodoro timer.
 3. Drag `QuestDoro.app` to your Applications folder
 4. Open QuestDoro from Applications
 
-> **Note:** On first launch, macOS may block the app. Go to **System Settings → Privacy & Security** and click "Open Anyway".
+> **Note:** On first launch, your Mac may block the app. Go to **System Settings → Privacy & Security** and click "Open Anyway".
 
 ## Features Controls
 
