@@ -1,6 +1,6 @@
 # QuestDoro
 
-A minimal, pixel-art styled Pomodoro timer.
+A minimal pixel-art style Pomodoro timer.
 
 ![QuestDoro Banner](banner.png)
 
