@@ -2,7 +2,7 @@
 
 A minimal, pixel-art styled Pomodoro timer.
 
-## Download
+## Download the app
 
 **[Download QuestDoro](../../releases/latest)** (macOS 13+)
 
@@ -15,13 +15,18 @@ A minimal, pixel-art styled Pomodoro timer.
 
 > **Note:** On first launch, macOS may block the app. Go to **System Settings → Privacy & Security** and click "Open Anyway".
 
-## Features
+## Features Controls
 
 - Pixel art aesthetic
 - Lives in the menu bar
 - Focus and break timer modes
+
+
+## Controls
+
 - Hover to expand, click to control
-- Double-click the timer to enter a custom time (press Enter to save)
+- Click the restart button twice to reset the entire session
+- Double-click the timer to enter a custom time (press Enter to save / Esc to discard changes)
 
 ## License
 
