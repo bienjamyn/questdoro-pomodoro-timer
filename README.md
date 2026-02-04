@@ -29,6 +29,8 @@ A minimal pixel-art style Pomodoro timer.
 
 ## Controls
 
+![QuestDoro Controls](QuestDoro%20Controls.gif)
+
 - Hover to expand, click to control
 - Click the restart button twice to reset the entire session
 - Double-click the timer to enter a custom time (press Enter to save / Esc to discard changes)
