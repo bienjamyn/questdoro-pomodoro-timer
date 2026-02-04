@@ -2,7 +2,7 @@
 
 A minimal pixel-art style Pomodoro timer.
 
-![QuestDoro Banner](banner.png)
+![QuestDoro Banner](QuestDoro%20Hero%20Image.png)
 
 ![Static Badge](https://img.shields.io/badge/release-v1.1.1-blue) ![Static Badge](https://img.shields.io/badge/License-MIT-orange?link=https%3A%2F%2Fgithub.com%2Fkevintayong%2Fpixeldoro-pomodoro-timer%2Fblob%2Fmain%2FLICENSE)
 
