@@ -20,7 +20,7 @@ A minimal pixel-art style Pomodoro timer.
 
 > **Note:** On first launch, your Mac may block the app. Go to **System Settings → Privacy & Security** and click "Open Anyway".
 
-## Features Controls
+## Features
 
 - Pixel art aesthetic
 - Lives in the menu bar
