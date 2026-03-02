@@ -173,7 +173,7 @@ final class PomodoroEngine: ObservableObject {
     }
 }
 
-private func parseFlexibleTime(_ raw: String) -> Int? {
+func parseFlexibleTime(_ raw: String) -> Int? {
     let s = raw.trimmingCharacters(in: .whitespacesAndNewlines)
     if s.isEmpty { return nil }
 

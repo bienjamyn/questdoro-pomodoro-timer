@@ -24,58 +24,6 @@ final class ClickThroughHostingView<Content: View>: NSHostingView<Content> {
     override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
 }
 
-final class AboutPanelController {
-    private var panel: KeyablePanel?
-
-    func toggle(anchorScreenPoint: NSPoint, quitAction: @escaping () -> Void) {
-        if let panel, panel.isVisible {
-            panel.orderOut(nil)
-            return
-        }
-        show(anchorScreenPoint: anchorScreenPoint, quitAction: quitAction)
-    }
-
-    private func show(anchorScreenPoint: NSPoint, quitAction: @escaping () -> Void) {
-        let view = NSHostingView(rootView: AboutPopoverView(quitAction: quitAction))
-
-        let p = KeyablePanel(
-            contentRect: NSRect(x: 0, y: 0, width: 240, height: 160),
-            styleMask: [.titled, .fullSizeContentView],
-            backing: .buffered,
-            defer: false
-        )
-
-        p.titleVisibility = .hidden
-        p.titlebarAppearsTransparent = true
-        p.isMovableByWindowBackground = true
-        p.isOpaque = false
-        p.backgroundColor = .windowBackgroundColor
-        p.hasShadow = true
-        p.level = .statusBar
-        p.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
-        p.hidesOnDeactivate = false
-
-        p.contentView = view
-
-        let x = max(10, anchorScreenPoint.x - 120)
-        let y = anchorScreenPoint.y - 170
-        p.setFrameOrigin(NSPoint(x: x, y: y))
-
-        p.makeKeyAndOrderFront(nil)
-        NSApp.activate(ignoringOtherApps: true)
-
-        NotificationCenter.default.addObserver(
-            forName: NSWindow.didResignKeyNotification,
-            object: p,
-            queue: .main
-        ) { [weak self] _ in
-            self?.panel?.orderOut(nil)
-        }
-
-        panel = p
-    }
-}
-
 final class MenuBarOverlayController {
     private var currentWidth: CGFloat = 200  // Use expanded width to avoid resizing
     private let maxPillHeight: CGFloat = 150 // Height to fit expanded pill (140pt + padding)

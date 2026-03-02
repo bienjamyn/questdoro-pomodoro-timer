@@ -2,6 +2,19 @@
 
 All notable changes to QuestDoro will be documented in this file.
 
+## [1.1.2] - 2026-03-01
+
+### Added
+- Unit tests for PomodoroEngine and time parsing (32 tests)
+- CLAUDE.md for AI-assisted development guidance
+
+### Removed
+- Dead code: PomodoroModel.swift (unused alternative implementation)
+- Dead code: AboutPopoverView.swift and AboutPanelController (unused about panel)
+
+### Changed
+- Made parseFlexibleTime function testable (internal visibility)
+
 ## [1.1.1] - 2026-02-03
 
 ### Added
