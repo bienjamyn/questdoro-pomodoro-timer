@@ -37,4 +37,4 @@ A minimal pixel-art style Pomodoro timer.
 
 ## License
 
-[MIT License](LICENSE)
+[MIT](LICENSE)
